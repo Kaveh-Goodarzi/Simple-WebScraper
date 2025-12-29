@@ -1,9 +1,11 @@
 //go:build integration
 // +build integration
+
 package main
 
-import "testing"
-
+import (
+	"testing"
+)
 func TestScraperWithInternet(t *testing.T) {
 	s := NewScraper()
 
