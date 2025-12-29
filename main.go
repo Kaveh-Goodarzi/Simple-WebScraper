@@ -53,24 +53,26 @@ func (s *Scraper) SetupCallbacks() {
 	s.collector.OnError(s.handleError)
 }
 
+// Change to get internet access
 func (s *Scraper) handleProduct(e *colly.HTMLElement) {
-	product := Product{
-		URL: e.ChildAttr("a", "href"),
-		Image: e.ChildAttr("img", "src"),
-		Name: e.ChildText(".product-name"),
-		Price: e.ChildText(".price"),
-	}
+	product := extractProductFromHTML(
+		e.ChildText(".product-name"),
+		e.ChildText(".price"),
+		e.ChildAttr("img", "src"),
+		e.ChildAttr("a", "href"),
+	)
 
 	s.products = append(s.products, product)
 	log.Printf("Scraped: %s - %s", product.Name, product.Price)
 }
+
 
 func (s *Scraper) handlePagination(e *colly.HTMLElement) {
 	nextPage := e.Attr("href")
 
 	if _, found := s.visitedURLs.Load(nextPage);!found {
 		s.visitedURLs.Store(nextPage, struct{}{})
-		fmt.Println("Moving to page: %s\n", nextPage)
+		fmt.Printf("Moving to page: %s\n", nextPage)
 		e.Request.Visit(nextPage)
 	}
 }
@@ -141,5 +143,16 @@ func main() {
 
 	if err := scraper.Start("https://www.scrapingcourse.com/ecommerce"); err != nil {
 		log.Fatal(err)
+	}
+}
+
+
+// Add for testing with internet access
+func extractProductFromHTML(name, price, image, url string) Product {
+	return Product{
+		Name:  name,
+		Price: price,
+		Image: image,
+		URL:   url,
 	}
 }

@@ -1,2 +1,6 @@
-go.sum
-go.mod
+products.csv
+*.out
+*.test
+.vscode/
+.idea/
+.DS_Store
